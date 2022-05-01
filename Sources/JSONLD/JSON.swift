@@ -494,12 +494,18 @@ extension JSON: CustomDebugStringConvertible {
         let u = unwrap()
         let options : JSONSerialization.WritingOptions
         if #available(OSX 10.15, *) {
-            options = [.fragmentsAllowed, .prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
+            if #available(iOS 13.0, *) {
+                options = [.fragmentsAllowed, .prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
+            } else {
+                // Fallback on earlier versions
+                options = [.fragmentsAllowed, .prettyPrinted]
+            }
         } else if #available(OSX 10.13, *) {
             options = [.fragmentsAllowed, .prettyPrinted, .sortedKeys]
         } else {
             options = [.fragmentsAllowed, .prettyPrinted]
         }
+        
         
         guard let d = try? JSONSerialization.data(withJSONObject: u, options: options) else {
             return "(invalid JSON serialization)"
